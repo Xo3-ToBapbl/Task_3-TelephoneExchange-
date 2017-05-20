@@ -1,14 +1,20 @@
-﻿using System;
+﻿using ATE.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATE.Classes
+namespace ATE.HandlerClasses
 {
-    public class Terminal
+    public class Terminal: ITerminal
     {
-        public Terminal() { }
+        public Terminal(int number)
+        {
+            _number = number;
+        }
+
+        private int _number;
 
         public event EventHandler Connecting;
         public event EventHandler Disconnecting;
