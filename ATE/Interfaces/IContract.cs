@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ATE.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,8 @@ namespace ATE.Interfaces
         string SubscriberLastName { get; set; }
 
         int TerminalNumber { get; set; }
+
+        TariffOption Tariff { get; set; }
 
         DateTime SignDate { get; set; }
 

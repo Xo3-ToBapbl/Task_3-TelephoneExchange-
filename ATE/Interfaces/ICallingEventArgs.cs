@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATE.Enums
+namespace ATE.Interfaces
 {
-    public enum States
+    public interface ICallingEventArgs
     {
-        Disabled,
-        Free,
-        Busy
+        int SourceNumber { get; }
+        int TargetNumber { get; }
     }
-
 }

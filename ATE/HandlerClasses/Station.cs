@@ -1,4 +1,5 @@
 ﻿using ATE.Enums;
+using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,21 @@ namespace ATE.HandlerClasses
             _terminals = new List<ITerminal>();
         }
 
-        private ICollection<ITerminal> _terminals;
+        private IList<ITerminal> _terminals;
         private IDictionary<int, IPort> _mapping;
+
+        public IList<ITerminal> Terminals
+        {
+            get
+            {
+                return _terminals;
+            }
+        }
 
         public void AddMapItem(int number, IPort port)
         {
+            port.PortStateChanging += this.DetectChanges;
+            port.PortCallTransfering += this.HandlePortRequest;
             _mapping[number] = port;
         }
 
@@ -29,11 +40,18 @@ namespace ATE.HandlerClasses
             _terminals.Add(terminal);
         }
 
-        
 
-        public void DetectChanges(object obj, PortState state)
+        public void DetectChanges(object obj, States state)
         {
             Console.WriteLine("Station: port change state to '{0}'.", state);
+        }
+
+        private void HandlePortRequest(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine(
+                "Station: port transfer call from terminal {0} to terminal {1}",
+                e.SourceNumber, e.TargetNumber);
+            IPort port = sender as IPort;
         }
     }
 }

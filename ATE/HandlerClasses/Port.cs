@@ -1,4 +1,5 @@
 ﻿using ATE.Enums;
+using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,15 +11,18 @@ namespace ATE.HandlerClasses
 {
     public class Port: IPort
     {
+        private ITerminal _terminal;
+
         public Port(ITerminal terminal)
         {
-            terminal.Connecting += this.SetStateFree;
-            terminal.Disconnecting += this.SetStateDisabled;
+            _terminal = terminal;
+            _terminal.Connecting += this.SetStateFree;
+            _terminal.Disconnecting += this.SetStateDisabled;
         }
 
-        private PortState _state = PortState.Disabled;
+        private States _state = States.Disabled;
 
-        public PortState State
+        public States State
         {
             get
             {
@@ -34,23 +38,32 @@ namespace ATE.HandlerClasses
             }
         }
 
-        public event EventHandler<PortState> PortStateChanging;
+        public event EventHandler<States> PortStateChanging;
+        public event EventHandler<ICallingEventArgs> PortCallTransfering;
 
-        #region Start event methods
-        protected virtual void OnPortStateChanged(object sender, PortState state)
+        #region Start event methods:
+        protected virtual void OnPortStateChanged(object sender, States state)
         {
             PortStateChanging?.Invoke(sender, state);
+        }
+
+        protected virtual void OnPortCallTransfer(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine("Port: terminal {0} calling", e.SourceNumber);
+            PortCallTransfering?.Invoke(sender, e);
         }
         #endregion
 
         private void SetStateFree(object obj, EventArgs args)
         {
-            this.State = PortState.Free;
+            this.State = States.Free;
+            _terminal.Calling += OnPortCallTransfer;
         }
 
         private void SetStateDisabled(object obj, EventArgs args)
         {
-            this.State = PortState.Disabled;
+            this.State = States.Disabled;
+            _terminal.Calling -= OnPortCallTransfer;
         }
     }
 }

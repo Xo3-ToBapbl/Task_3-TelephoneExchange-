@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using ATE.HandlerClasses;
 using ATE.Interfaces;
 using ATE.BaseClasses;
+using ATE.Enums;
 
 namespace Demonstration
 {
@@ -18,25 +19,26 @@ namespace Demonstration
             ISubscriber subscriber_2 = new Subscriber("Bill", "Murray");
             ISubscriber subscriber_3 = new Subscriber("Andrew", "Boget");
             #endregion
-            Contract contract_1 = new Contract(
-                subscriber_1.FirstName, subscriber_1.LastName, "555-555", DateTime.Today);
 
-            Operator operator_1 = new Operator();
-            operator_1.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 555111);
-            operator_1.SignContract(subscriber_2.FirstName, subscriber_1.LastName, 555222);
-            operator_1.SignContract(subscriber_3.FirstName, subscriber_1.LastName, 555333);
+            IStation station = new Station();
+
+            Operator operator_1 = new Operator(station);
+            operator_1.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.Easy);
+            operator_1.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.Standart);
+            operator_1.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.Easy);
+
+            ITerminal terminal_1 = station.Terminals[0];
+            ITerminal terminal_2 = station.Terminals[1];
+            ITerminal terminal_3 = station.Terminals[2];
 
             #region Tests:
-            //Terminal terminal_1 = new Terminal();
-            //Port port_1 = new Port(terminal_1);
-
-            //Station station = new Station(port_1);
-
-            //terminal_1.Connect();
-            //terminal_1.Disconect();
+            terminal_2.Connect();
+            terminal_2.Call(333333);
+            terminal_1.Connect();
+            terminal_1.Call(555333);
             #endregion
             #region Close application
-            Console.WriteLine("Press any key to close.");
+            Console.WriteLine("\nPress any key to close.");
             Console.ReadKey();
             #endregion
         }

@@ -1,4 +1,5 @@
-﻿using ATE.Interfaces;
+﻿using ATE.Enums;
+using ATE.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,13 @@ namespace ATE.BaseClasses
 {
     public class Contract : IContract
     {
-        public Contract(string firstName, string lastName, int terminalNumber, DateTime signDate)
+        public Contract(
+            string firstName, string lastName, int terminalNumber, TariffOption tariff, DateTime signDate)
         {
             SubscriberFirstName = firstName;
             SubscriberLastName = lastName;
             TerminalNumber = terminalNumber;
+            Tariff = tariff;
             SignDate = signDate; 
         }
 
@@ -22,6 +25,8 @@ namespace ATE.BaseClasses
         public string SubscriberLastName { get; set; }
 
         public int TerminalNumber { get; set; }
+
+        public TariffOption Tariff { get; set; }
 
         public DateTime SignDate { get; set; }
 

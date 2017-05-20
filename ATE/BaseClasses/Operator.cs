@@ -1,4 +1,5 @@
-﻿using ATE.HandlerClasses;
+﻿using ATE.Enums;
+using ATE.HandlerClasses;
 using ATE.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,9 +20,9 @@ namespace ATE.BaseClasses
             _station = station;
         }
 
-        public void SignContract(string firstName, string lastName, int terminalNumber)
+        public void SignContract(string firstName, string lastName, int terminalNumber, TariffOption tariff)
         {
-            IContract newContract = new Contract(firstName, lastName, terminalNumber, DateTime.Now);
+            IContract newContract = new Contract(firstName, lastName, terminalNumber, tariff, DateTime.Now);
             Guid id = Guid.NewGuid();
 
             _contracts[id] = newContract;
