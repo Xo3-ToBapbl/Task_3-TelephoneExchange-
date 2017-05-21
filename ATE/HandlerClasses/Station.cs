@@ -31,7 +31,7 @@ namespace ATE.HandlerClasses
         public void AddMapItem(int number, IPort port)
         {
             port.PortStateChanging += this.DetectChanges;
-            port.PortCallTransfering += this.HandlePortRequest;
+            port.PortCallSending += this.HandlePortRequest;
             _mapping[number] = port;
         }
 
@@ -41,7 +41,7 @@ namespace ATE.HandlerClasses
         }
 
 
-        public void DetectChanges(object obj, States state)
+        public void DetectChanges(object obj, PortStates state)
         {
             Console.WriteLine("Station: port change state to '{0}'.", state);
         }
@@ -51,7 +51,17 @@ namespace ATE.HandlerClasses
             Console.WriteLine(
                 "Station: port transfer call from terminal {0} to terminal {1}",
                 e.SourceNumber, e.TargetNumber);
-            IPort port = sender as IPort;
+
+            if (_mapping.ContainsKey(e.TargetNumber))
+            {
+                IPort sourcePort = sender as IPort;
+                IPort targetPort = _mapping[e.TargetNumber];
+
+                if (targetPort.State == PortStates.Free)
+                {
+                    targetPort.PortReciveCall(targetPort, e);
+                }
+            }
         }
     }
 }

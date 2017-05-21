@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ATE.Enums
 {
-    public enum States
+    public enum PortStates
     {
         Disabled,
         Free,

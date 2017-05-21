@@ -13,11 +13,14 @@ namespace ATE.Interfaces
         event EventHandler Connecting;
         event EventHandler Disconnecting;
         event EventHandler<ICallingEventArgs> Calling;
+        event EventHandler<ICallingEventArgs> Answering;
 
-        States State { get; set; }
+        TerminalStates State { get; set; }
 
         void Connect();
         void Disconect();
         void Call(int targetNumber);
+        void SetIncommingCallState(object sender, ICallingEventArgs e);
+        void Answer();
     }
 }

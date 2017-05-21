@@ -17,7 +17,8 @@ namespace ATE.HandlerClasses
         }
 
         private int _number;
-        private States _state;
+        private TerminalStates _state;
+        private ICallingEventArgs _e;
 
         public int Number
         {
@@ -27,7 +28,7 @@ namespace ATE.HandlerClasses
             }
         }
 
-        public States State
+        public TerminalStates State
         {
             get
             {
@@ -45,6 +46,7 @@ namespace ATE.HandlerClasses
         public event EventHandler Connecting;
         public event EventHandler Disconnecting;
         public event EventHandler<ICallingEventArgs> Calling;
+        public event EventHandler<ICallingEventArgs> Answering;
 
         #region Start event methods:
         protected virtual void OnConnecting(object sender, EventArgs args)
@@ -61,26 +63,53 @@ namespace ATE.HandlerClasses
         {
             Calling?.Invoke(this, new CallEventArgs(this.Number, targetNumber));
         }
+
+        protected virtual void OnAnswering()
+        {
+            Answering?.Invoke(this, _e);
+        }
         #endregion
 
         public void Connect()
         {
-            State = States.Free;
+            State = TerminalStates.Connected;
             OnConnecting(this, null);
         }   
 
         public void Disconect()
         {
-            State = States.Disabled;
+            State = TerminalStates.Disconnected;
             OnDisconnecting(this, null);
         }
 
         public void Call(int targetNumber)
         {
-            if (State == States.Free)
+            if (State == TerminalStates.Connected)
             {
-                State = States.Busy;
+                State = TerminalStates.OutgoingCall;
                 OnCalling(targetNumber);
+            }
+        }
+
+        public void SetIncommingCallState(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine("Terminal {0}: have incomming call from {1}", e.TargetNumber, e.SourceNumber);
+
+            if (State == TerminalStates.Connected)
+            {
+                State = TerminalStates.IncommingCall;
+                _e = e;
+            }
+        }
+
+        public void Answer()
+        {
+            if (State == TerminalStates.IncommingCall)
+            {
+                Console.WriteLine("Terminal {0}: answer a call from {1}", this.Number, _e.SourceNumber);
+
+                State = TerminalStates.Online;
+                OnAnswering();
             }
         }
     }

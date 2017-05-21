@@ -10,7 +10,11 @@ namespace ATE.Interfaces
 {
     public interface IPort
     {
-        event EventHandler<States> PortStateChanging;
-        event EventHandler<ICallingEventArgs> PortCallTransfering;
+        PortStates State { get; set; }
+
+        event EventHandler<PortStates> PortStateChanging;
+        event EventHandler<ICallingEventArgs> PortCallSending;
+
+        void PortReciveCall(object sender, ICallingEventArgs e);
     }
 }

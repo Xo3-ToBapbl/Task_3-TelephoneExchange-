@@ -20,9 +20,9 @@ namespace ATE.HandlerClasses
             _terminal.Disconnecting += this.SetStateDisabled;
         }
 
-        private States _state = States.Disabled;
+        private PortStates _state = PortStates.Disabled;
 
-        public States State
+        public PortStates State
         {
             get
             {
@@ -38,32 +38,60 @@ namespace ATE.HandlerClasses
             }
         }
 
-        public event EventHandler<States> PortStateChanging;
-        public event EventHandler<ICallingEventArgs> PortCallTransfering;
+        public event EventHandler<PortStates> PortStateChanging;
+        public event EventHandler<ICallingEventArgs> PortCallSending;
+        public event EventHandler<ICallingEventArgs> PortCallReciving;
+        public event EventHandler<ICallingEventArgs> PortAnswerSending;
+
 
         #region Start event methods:
-        protected virtual void OnPortStateChanged(object sender, States state)
+        protected virtual void OnPortStateChanged(object sender, PortStates state)
         {
             PortStateChanging?.Invoke(sender, state);
         }
 
-        protected virtual void OnPortCallTransfer(object sender, ICallingEventArgs e)
+        protected virtual void OnPortCallSend(object sender, ICallingEventArgs e)
         {
             Console.WriteLine("Port: terminal {0} calling", e.SourceNumber);
-            PortCallTransfering?.Invoke(sender, e);
+
+            this.State = PortStates.Busy;
+            PortCallSending?.Invoke(sender, e);
+        }
+
+        protected virtual void OnPortRecive(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine("Port: recive call from {0} to {1}", e.SourceNumber, e.TargetNumber);
+
+            PortCallReciving?.Invoke(sender, e);
+        }
+
+        protected virtual void OnPortAnswerSend(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine("Port: transfer answer from {0} to {1}", e.TargetNumber, e.SourceNumber);
+
+            PortAnswerSending?.Invoke(sender, e);
         }
         #endregion
 
         private void SetStateFree(object obj, EventArgs args)
         {
-            this.State = States.Free;
-            _terminal.Calling += OnPortCallTransfer;
+            this.State = PortStates.Free;
+            _terminal.Calling += OnPortCallSend;
+            this.PortCallReciving += _terminal.SetIncommingCallState;
         }
 
         private void SetStateDisabled(object obj, EventArgs args)
         {
-            this.State = States.Disabled;
-            _terminal.Calling -= OnPortCallTransfer;
+            this.State = PortStates.Disabled;
+            _terminal.Calling -= OnPortCallSend;
+            this.PortCallReciving -= _terminal.SetIncommingCallState;
+        }
+
+        public void PortReciveCall(object sender, ICallingEventArgs e)
+        {
+            this.State = PortStates.Busy;
+            _terminal.Answering += OnPortAnswerSend;
+            OnPortRecive(sender, e);
         }
     }
 }

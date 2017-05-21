@@ -31,11 +31,13 @@ namespace Demonstration
             ITerminal terminal_2 = station.Terminals[1];
             ITerminal terminal_3 = station.Terminals[2];
 
-            #region Tests:
-            terminal_2.Connect();
-            terminal_2.Call(333333);
+            #region Tests: 
             terminal_1.Connect();
-            terminal_1.Call(555333);
+            terminal_2.Connect();
+
+            terminal_1.Call(222222);
+            terminal_2.Answer();
+
             #endregion
             #region Close application
             Console.WriteLine("\nPress any key to close.");
