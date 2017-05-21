@@ -21,15 +21,18 @@ namespace Demonstration
             #endregion
 
             IStation station = new Station();
-
             Operator operator_1 = new Operator(station);
+
+            #region Contracts:
             operator_1.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.Easy);
             operator_1.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.Standart);
             operator_1.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.Easy);
-
+            #endregion
+            #region Terminals:
             ITerminal terminal_1 = station.Terminals[0];
             ITerminal terminal_2 = station.Terminals[1];
             ITerminal terminal_3 = station.Terminals[2];
+            #endregion
 
             #region Tests: 
             terminal_1.Connect();
@@ -37,6 +40,7 @@ namespace Demonstration
 
             terminal_1.Call(222222);
             terminal_2.Answer();
+            terminal_2.EndCall();
 
             #endregion
             #region Close application

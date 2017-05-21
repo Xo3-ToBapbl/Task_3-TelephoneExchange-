@@ -47,6 +47,8 @@ namespace ATE.HandlerClasses
         public event EventHandler Disconnecting;
         public event EventHandler<ICallingEventArgs> Calling;
         public event EventHandler<ICallingEventArgs> Answering;
+        public event EventHandler<ICallingEventArgs> Ignoring;
+        public event EventHandler<ICallingEventArgs> Ending;
 
         #region Start event methods:
         protected virtual void OnConnecting(object sender, EventArgs args)
@@ -68,6 +70,17 @@ namespace ATE.HandlerClasses
         {
             Answering?.Invoke(this, _e);
         }
+
+        protected virtual void OnIgnoring()
+        {
+            Ignoring?.Invoke(this, _e);
+        }
+
+        protected virtual void OnEnding()
+        {
+            Ending?.Invoke(this, _e);
+        }
+
         #endregion
 
         public void Connect()
@@ -93,7 +106,7 @@ namespace ATE.HandlerClasses
 
         public void SetIncommingCallState(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine("Terminal {0}: have incomming call from {1}", e.TargetNumber, e.SourceNumber);
+            Console.WriteLine("Terminal {0}: have incomming call from terminal {1}.\n", e.TargetNumber, e.SourceNumber);
 
             if (State == TerminalStates.Connected)
             {
@@ -106,7 +119,7 @@ namespace ATE.HandlerClasses
         {
             if (State == TerminalStates.IncommingCall)
             {
-                Console.WriteLine("Terminal {0}: answer a call from {1}", this.Number, _e.SourceNumber);
+                Console.WriteLine("Terminal {0}: answer a call from terminal {1}.\n", this.Number, _e.SourceNumber);
 
                 State = TerminalStates.Online;
                 OnAnswering();
@@ -117,8 +130,40 @@ namespace ATE.HandlerClasses
         {
             if (State == TerminalStates.OutgoingCall)
             {
+                _e = e;
                 State = TerminalStates.Online;
-                Console.WriteLine("Terminal {1}: online with terminal {1}.", e.TargetNumber, e.SourceNumber);
+                Console.WriteLine("Terminal {0}: online with terminal {1}.\n", this.Number, e.TargetNumber);
+            }
+        }
+
+        public void Ignore()
+        {
+            if (State == TerminalStates.IncommingCall)
+            {
+                Console.WriteLine("Terminal {0}: ignore a call from terminal {1}.\n", this.Number, _e.SourceNumber);
+
+                State = TerminalStates.Connected;
+                OnIgnoring();
+            }
+        }
+
+        public void SetConnectedState(object sender, ICallingEventArgs e)
+        {
+            if (State == TerminalStates.OutgoingCall || State == TerminalStates.Online)
+            {
+                State = TerminalStates.Connected;
+                Console.WriteLine("Terminal {0}: terminal {1} ignore or end call.\n", this.Number, e.TargetNumber);
+            }
+        }
+
+        public void EndCall()
+        {
+            if (State == TerminalStates.Online)
+            {
+                Console.WriteLine("Terminal {0}: end call with terminal {1}.\n", this.Number, _e.SourceNumber);
+
+                State = TerminalStates.Connected;
+                OnEnding();
             }
         }
     }

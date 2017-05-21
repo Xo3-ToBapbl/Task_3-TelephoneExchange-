@@ -14,14 +14,20 @@ namespace ATE.Interfaces
         event EventHandler Disconnecting;
         event EventHandler<ICallingEventArgs> Calling;
         event EventHandler<ICallingEventArgs> Answering;
+        event EventHandler<ICallingEventArgs> Ignoring;
+        event EventHandler<ICallingEventArgs> Ending;
 
         TerminalStates State { get; set; }
+        int Number { get; }
 
         void Connect();
         void Disconect();
         void Call(int targetNumber);
-        void SetIncommingCallState(object sender, ICallingEventArgs e);
         void Answer();
+        void Ignore();
+        void EndCall();
+        void SetIncommingCallState(object sender, ICallingEventArgs e);
         void SetOnlineState(object sender, ICallingEventArgs e);
+        void SetConnectedState(object sender, ICallingEventArgs e);
     }
 }
