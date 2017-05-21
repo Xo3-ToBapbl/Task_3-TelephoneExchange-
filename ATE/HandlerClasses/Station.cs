@@ -14,11 +14,15 @@ namespace ATE.HandlerClasses
         public Station()
         {
             _mapping = new Dictionary<int, IPort>();
+            _waitingConnection = new Dictionary<IPort, IPort>();
+            _onConnection = new Dictionary<IPort, IPort>();
             _terminals = new List<ITerminal>();
         }
 
         private IList<ITerminal> _terminals;
         private IDictionary<int, IPort> _mapping;
+        private IDictionary<IPort, IPort> _waitingConnection;
+        private IDictionary<IPort, IPort> _onConnection;
 
         public IList<ITerminal> Terminals
         {
@@ -31,7 +35,8 @@ namespace ATE.HandlerClasses
         public void AddMapItem(int number, IPort port)
         {
             port.PortStateChanging += this.DetectChanges;
-            port.PortCallSending += this.HandlePortRequest;
+            port.PortCallSending += this.HandlePortCallRequest;
+            port.PortAnswerSending += this.HandlePortAnswerRequest;
             _mapping[number] = port;
         }
 
@@ -46,7 +51,7 @@ namespace ATE.HandlerClasses
             Console.WriteLine("Station: port change state to '{0}'.", state);
         }
 
-        private void HandlePortRequest(object sender, ICallingEventArgs e)
+        private void HandlePortCallRequest(object sender, ICallingEventArgs e)
         {
             Console.WriteLine(
                 "Station: port transfer call from terminal {0} to terminal {1}",
@@ -56,11 +61,26 @@ namespace ATE.HandlerClasses
             {
                 IPort sourcePort = sender as IPort;
                 IPort targetPort = _mapping[e.TargetNumber];
+                _waitingConnection[targetPort] = sourcePort;
 
                 if (targetPort.State == PortStates.Free)
                 {
                     targetPort.PortReciveCall(targetPort, e);
                 }
+            }
+        }
+
+        private void HandlePortAnswerRequest(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine(
+                "Station: port transfer answer from terminal {1} to terminal {0}",
+                e.SourceNumber, e.TargetNumber);
+
+            IPort sourcePort = _waitingConnection[sender as IPort];
+
+            if (sourcePort.State == PortStates.Busy)
+            {
+                sourcePort.PortReciveAnswer(sourcePort, e);
             }
         }
     }

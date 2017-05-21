@@ -112,5 +112,14 @@ namespace ATE.HandlerClasses
                 OnAnswering();
             }
         }
+
+        public void SetOnlineState(object sender, ICallingEventArgs e)
+        {
+            if (State == TerminalStates.OutgoingCall)
+            {
+                State = TerminalStates.Online;
+                Console.WriteLine("Terminal {1}: online with terminal {1}.", e.TargetNumber, e.SourceNumber);
+            }
+        }
     }
 }

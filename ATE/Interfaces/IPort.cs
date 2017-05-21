@@ -14,7 +14,9 @@ namespace ATE.Interfaces
 
         event EventHandler<PortStates> PortStateChanging;
         event EventHandler<ICallingEventArgs> PortCallSending;
+        event EventHandler<ICallingEventArgs> PortAnswerSending;
 
         void PortReciveCall(object sender, ICallingEventArgs e);
+        void PortReciveAnswer(object sender, ICallingEventArgs e);
     }
 }

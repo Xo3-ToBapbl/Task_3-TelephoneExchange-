@@ -22,5 +22,6 @@ namespace ATE.Interfaces
         void Call(int targetNumber);
         void SetIncommingCallState(object sender, ICallingEventArgs e);
         void Answer();
+        void SetOnlineState(object sender, ICallingEventArgs e);
     }
 }

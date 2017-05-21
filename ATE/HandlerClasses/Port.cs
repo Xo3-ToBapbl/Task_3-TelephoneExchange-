@@ -42,6 +42,7 @@ namespace ATE.HandlerClasses
         public event EventHandler<ICallingEventArgs> PortCallSending;
         public event EventHandler<ICallingEventArgs> PortCallReciving;
         public event EventHandler<ICallingEventArgs> PortAnswerSending;
+        public event EventHandler<ICallingEventArgs> PortAnswerReciving;
 
 
         #region Start event methods:
@@ -55,10 +56,10 @@ namespace ATE.HandlerClasses
             Console.WriteLine("Port: terminal {0} calling", e.SourceNumber);
 
             this.State = PortStates.Busy;
-            PortCallSending?.Invoke(sender, e);
+            PortCallSending?.Invoke(this, e);
         }
 
-        protected virtual void OnPortRecive(object sender, ICallingEventArgs e)
+        protected virtual void OnPortCallRecive(object sender, ICallingEventArgs e)
         {
             Console.WriteLine("Port: recive call from {0} to {1}", e.SourceNumber, e.TargetNumber);
 
@@ -69,7 +70,14 @@ namespace ATE.HandlerClasses
         {
             Console.WriteLine("Port: transfer answer from {0} to {1}", e.TargetNumber, e.SourceNumber);
 
-            PortAnswerSending?.Invoke(sender, e);
+            PortAnswerSending?.Invoke(this, e);
+        }
+
+        protected virtual void OnPortAnswerRecive(object sender, ICallingEventArgs e)
+        {
+            Console.WriteLine("Port: recive answer from {0} to {1}", e.TargetNumber, e.SourceNumber);
+
+            PortAnswerReciving?.Invoke(sender, e);
         }
         #endregion
 
@@ -77,21 +85,30 @@ namespace ATE.HandlerClasses
         {
             this.State = PortStates.Free;
             _terminal.Calling += OnPortCallSend;
+            _terminal.Answering += OnPortAnswerSend;
             this.PortCallReciving += _terminal.SetIncommingCallState;
+            this.PortAnswerReciving += _terminal.SetOnlineState;
         }
 
         private void SetStateDisabled(object obj, EventArgs args)
         {
             this.State = PortStates.Disabled;
             _terminal.Calling -= OnPortCallSend;
+            _terminal.Answering -= OnPortAnswerSend;
             this.PortCallReciving -= _terminal.SetIncommingCallState;
+            this.PortAnswerReciving -= _terminal.SetOnlineState;
+
         }
 
         public void PortReciveCall(object sender, ICallingEventArgs e)
         {
             this.State = PortStates.Busy;
-            _terminal.Answering += OnPortAnswerSend;
-            OnPortRecive(sender, e);
+            OnPortCallRecive(sender, e);
+        }
+
+        public void PortReciveAnswer(object sender, ICallingEventArgs e)
+        {
+            OnPortAnswerRecive(sender, e);
         }
     }
 }
