@@ -14,8 +14,7 @@ namespace ATE.Interfaces
         event EventHandler Disconnecting;
         event EventHandler<ICallingEventArgs> Calling;
         event EventHandler<ICallingEventArgs> Answering;
-        event EventHandler<ICallingEventArgs> Ignoring;
-        event EventHandler<ICallingEventArgs> Ending;
+        event EventHandler<ICallingEventArgs> Rejecting;
 
         TerminalStates State { get; set; }
         int Number { get; }
@@ -24,8 +23,7 @@ namespace ATE.Interfaces
         void Disconect();
         void Call(int targetNumber);
         void Answer();
-        void Ignore();
-        void EndCall();
+        void Reject();
         void SetIncommingCallState(object sender, ICallingEventArgs e);
         void SetOnlineState(object sender, ICallingEventArgs e);
         void SetConnectedState(object sender, ICallingEventArgs e);

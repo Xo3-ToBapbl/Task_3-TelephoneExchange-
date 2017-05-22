@@ -16,12 +16,10 @@ namespace ATE.Interfaces
         event EventHandler<PortStates> PortStateChanging;
         event EventHandler<ICallingEventArgs> PortCallSending;
         event EventHandler<ICallingEventArgs> PortAnswerSending;
-        event EventHandler<ICallingEventArgs> PortIgnoreSending;
-        event EventHandler<ICallingEventArgs> PortEndCallSending;
+        event EventHandler<ICallingEventArgs> PortRejectSending;
 
         void PortReciveCall(object sender, ICallingEventArgs e);
         void PortReciveAnswer(object sender, ICallingEventArgs e);
-        void PortReciveIgnore(object sender, ICallingEventArgs e);
-        void PortReciveEndCall(object sender, ICallingEventArgs e);
+        void PortReciveReject(object sender, ICallingEventArgs e);
     }
 }

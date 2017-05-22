@@ -19,6 +19,7 @@ namespace ATE.HandlerClasses
         {
             _terminal = terminal;
             _portId = string.Format("p{0}", _terminal.Number.ToString());
+
             _terminal.Connecting += this.SetStateFree;
             _terminal.Disconnecting += this.SetStateDisabled;
         }
@@ -52,16 +53,16 @@ namespace ATE.HandlerClasses
         public event EventHandler<ICallingEventArgs> PortCallReciving;
         public event EventHandler<ICallingEventArgs> PortAnswerSending;
         public event EventHandler<ICallingEventArgs> PortAnswerReciving;
-        public event EventHandler<ICallingEventArgs> PortIgnoreSending;
-        public event EventHandler<ICallingEventArgs> PortIgnoreReciving;
-        public event EventHandler<ICallingEventArgs> PortEndCallSending;
-        public event EventHandler<ICallingEventArgs> PortEndCallReciving;
+        public event EventHandler<ICallingEventArgs> PortRejectSending;
+        public event EventHandler<ICallingEventArgs> PortRejectReciving;
 
 
         #region Start event methods:
+
         protected virtual void OnPortStateChanged(object sender, PortStates state)
-        {
-            Console.WriteLine("Port[{0}]: changing state to '{1}'.\n", this.PortId, state);
+        { 
+            //Console.WriteLine("Port[{0}]: changing state to '{1}', terminal {2} now {3}.\n", 
+                //this.PortId, state, _terminal.Number, _terminal.State);
 
             PortStateChanging?.Invoke(sender, state);
         }
@@ -99,37 +100,23 @@ namespace ATE.HandlerClasses
             PortAnswerReciving?.Invoke(sender, e);
         }
 
-        protected virtual void OnPortIgnoreSend(object sender, ICallingEventArgs e)
+        protected virtual void OnPortRejectSend(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine("Port[p{0}]: transfer ignore proc from {1} to {2}.\n",
+            Console.WriteLine("Port[{0}]: transfer reject from {1} to {2}.\n",
                 this.PortId, e.TargetNumber, e.SourceNumber);
 
-            PortIgnoreSending?.Invoke(this, e);
+            this.State = PortStates.Free;
+            PortRejectSending?.Invoke(this, e);
         }
 
-        protected virtual void OnPortIgnoreRecive(object sender, ICallingEventArgs e)
+        protected virtual void OnPortRejectRecive(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine("Port[{0}]: recive ignore proc from {1} to {2}.\n",
-                this.PortId, e.TargetNumber, e.SourceNumber);
+            Console.WriteLine("Port[{0}]: recive reject.\n", this.PortId);
 
-            PortIgnoreReciving?.Invoke(sender, e);
+            this.State = PortStates.Free;
+            PortRejectReciving?.Invoke(sender, e);
         }
 
-        protected virtual void OnPortEndCallSend(object sender, ICallingEventArgs e)
-        {
-            Console.WriteLine("Port[p{0}]: transfer end call proc from {1} to {2}.\n",
-                this.PortId, e.TargetNumber, e.SourceNumber);
-
-            PortEndCallSending?.Invoke(this, e);
-        }
-
-        protected virtual void OnPortEndCallRecive(object sender, ICallingEventArgs e)
-        {
-            Console.WriteLine("Port[{0}]: recive end call proc from {1} to {2}.\n",
-                this.PortId, e.TargetNumber, e.SourceNumber);
-
-            PortEndCallReciving?.Invoke(sender, e);
-        }
         #endregion
 
         private void SetStateFree(object obj, EventArgs args)
@@ -138,13 +125,11 @@ namespace ATE.HandlerClasses
 
             _terminal.Calling += OnPortCallSend;
             _terminal.Answering += OnPortAnswerSend;
-            _terminal.Ignoring += OnPortIgnoreSend;
-            _terminal.Ending += OnPortEndCallSend;
+            _terminal.Rejecting += OnPortRejectSend;
 
             this.PortCallReciving += _terminal.SetIncommingCallState;
             this.PortAnswerReciving += _terminal.SetOnlineState;
-            this.PortIgnoreReciving += _terminal.SetConnectedState;
-            this.PortEndCallReciving += _terminal.SetConnectedState;
+            this.PortRejectReciving += _terminal.SetConnectedState;
         }
 
         private void SetStateDisabled(object obj, EventArgs args)
@@ -153,13 +138,11 @@ namespace ATE.HandlerClasses
 
             _terminal.Calling -= OnPortCallSend;
             _terminal.Answering -= OnPortAnswerSend;
-            _terminal.Ignoring -= OnPortIgnoreSend;
-            _terminal.Ending -= OnPortEndCallSend;
+            _terminal.Rejecting -= OnPortRejectSend;
 
             this.PortCallReciving -= _terminal.SetIncommingCallState;
             this.PortAnswerReciving -= _terminal.SetOnlineState;
-            this.PortIgnoreReciving -= _terminal.SetConnectedState;
-            this.PortEndCallReciving -= _terminal.SetConnectedState;
+            this.PortRejectReciving -= _terminal.SetConnectedState;
         }
 
 
@@ -174,14 +157,9 @@ namespace ATE.HandlerClasses
             OnPortAnswerRecive(sender, e);
         }
 
-        public void PortReciveIgnore(object sender, ICallingEventArgs e)
+        public void PortReciveReject(object sender, ICallingEventArgs e)
         {
-            OnPortIgnoreRecive(sender, e);
-        }
-
-        public void PortReciveEndCall(object sender, ICallingEventArgs e)
-        {
-            OnPortEndCallRecive(sender, e);
+            OnPortRejectRecive(sender, e);
         }
     }
 }

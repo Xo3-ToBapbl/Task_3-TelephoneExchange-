@@ -11,5 +11,6 @@ namespace ATE.Interfaces
         void AddMapItem(int number, IPort port);
         void AddTerminal(ITerminal terminal);
         IList<ITerminal> Terminals { get; }
+        IList<IPort> Ports { get; }
     }
 }

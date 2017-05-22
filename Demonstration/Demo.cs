@@ -28,7 +28,11 @@ namespace Demonstration
             operator_1.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.Standart);
             operator_1.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.Easy);
             #endregion
-            #region Terminals:
+            #region Terminals, ports:
+            IPort port_1 = station.Ports[0];
+            IPort port_2 = station.Ports[1];
+            IPort port_3 = station.Ports[2];
+
             ITerminal terminal_1 = station.Terminals[0];
             ITerminal terminal_2 = station.Terminals[1];
             ITerminal terminal_3 = station.Terminals[2];
@@ -40,8 +44,8 @@ namespace Demonstration
 
             terminal_1.Call(222222);
             terminal_2.Answer();
-            terminal_2.EndCall();
-
+            terminal_1.Reject();
+            
             #endregion
             #region Close application
             Console.WriteLine("\nPress any key to close.");

@@ -17,12 +17,14 @@ namespace ATE.HandlerClasses
             _waitingConnection = new Dictionary<IPort, IPort>();
             _onConnection = new Dictionary<IPort, IPort>();
             _terminals = new List<ITerminal>();
+            _ports = new List<IPort>();
         }
 
         private IList<ITerminal> _terminals;
+        private IList<IPort> _ports;
         private IDictionary<int, IPort> _mapping;
-        private IDictionary<IPort, IPort> _waitingConnection;
-        private IDictionary<IPort, IPort> _onConnection;
+        private IDictionary<IPort, IPort> _waitingConnection;   // key - who call, value - whom call
+        private IDictionary<IPort, IPort> _onConnection;        // key - who call, value - whom call
 
         public IList<ITerminal> Terminals
         {
@@ -32,14 +34,22 @@ namespace ATE.HandlerClasses
             }
         }
 
+        public IList<IPort> Ports
+        {
+            get
+            {
+                return _ports;
+            }
+        }
+
         public void AddMapItem(int number, IPort port)
         {
             port.PortStateChanging += this.DetectChanges;
             port.PortCallSending += this.HandlePortCallRequest;
             port.PortAnswerSending += this.HandlePortAnswerRequest;
-            port.PortIgnoreSending += this.HandlePortIgnoreRequest;
-            port.PortEndCallSending += this.HandlePortEndCallRequest;
+            port.PortRejectSending += this.HandlePortRejectRequest;
 
+            _ports.Add(port);
             _mapping[number] = port;
         }
 
@@ -51,21 +61,22 @@ namespace ATE.HandlerClasses
 
         public void DetectChanges(object sender, PortStates state)
         {
-            Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
-                (sender as IPort).PortId, state);
+            //Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
+                //(sender as IPort).PortId, state);
         }
 
         private void HandlePortCallRequest(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine(
+            if (_mapping.ContainsKey(e.TargetNumber))
+            {
+                Console.WriteLine(
                 "Station: port[{0}] transfer call from terminal {1} to terminal {2}.\n",
                 (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
 
-            if (_mapping.ContainsKey(e.TargetNumber))
-            {
                 IPort sourcePort = sender as IPort;
                 IPort targetPort = _mapping[e.TargetNumber];
-                _waitingConnection[targetPort] = sourcePort;
+
+                _waitingConnection[sourcePort] = targetPort;
 
                 if (targetPort.State == PortStates.Free)
                 {
@@ -80,40 +91,71 @@ namespace ATE.HandlerClasses
                 "Station: port[{0}] transfer answer from terminal {2} to terminal {1}. Terminals online.\n",
                 (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
 
-            IPort sourcePort = _waitingConnection[sender as IPort];
+            IPort targetPort = sender as IPort;
+            IPort sourcePort = _mapping[e.SourceNumber];
 
             if (sourcePort.State == PortStates.Busy)
             {
-                sourcePort.PortReciveAnswer(sourcePort, e);
+                _waitingConnection.Remove(targetPort); _waitingConnection.Remove(sourcePort);
+                _onConnection[sourcePort] = targetPort;
+                sourcePort.PortReciveAnswer(targetPort, e);
             }
         }
 
-        private void HandlePortIgnoreRequest(object sender, ICallingEventArgs e)
+        private void HandlePortRejectRequest(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine(
-                "Station: port[{0}] transfer ignore proc from terminal {2} to terminal {1}.\n",
-                (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
+            IPort port = sender as IPort;
 
-            IPort sourcePort = _waitingConnection[sender as IPort];
-
-            if (sourcePort.State == PortStates.Busy)
+            if (_waitingConnection.Values.Contains(port))
             {
-                sourcePort.PortReciveIgnore(sourcePort, e);
+                HandleIgnoreRequest(port, e);
+            }
+            else if (_onConnection.Keys.Contains(port))
+            {
+                HandleRejectRequestFromSourceTerminal(port, e);
+            }
+            else if (_onConnection.Values.Contains(port))
+            {
+                HandleRejectRequestFromTargetTerminal(port, e);
             }
         }
 
-        private void HandlePortEndCallRequest(object sender, ICallingEventArgs e)
-        {
+        
+        private void HandleIgnoreRequest(IPort port, ICallingEventArgs e)
+        {// Ignore request only from 'target' terminal
+            IPort targetPort = port;
+            IPort sourcePort = _waitingConnection.FirstOrDefault(x => x.Value == port).Key;
+            _waitingConnection.Remove(sourcePort);
+
             Console.WriteLine(
-                "Station: port[{0}] transfer end call proc from terminal {2} to terminal {1}.\n",
-                (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
+                "Station: port[{0}] transfer reject from terminal {2} to terminal {1}.\n",
+                targetPort.PortId, e.SourceNumber, e.TargetNumber);
 
-            IPort sourcePort = _waitingConnection[sender as IPort];
+            sourcePort.PortReciveReject(sourcePort, e);
+        }
 
-            if (sourcePort.State == PortStates.Busy)
-            {
-                sourcePort.PortReciveEndCall(sourcePort, e);
-            }
+        private void HandleRejectRequestFromSourceTerminal(IPort port, ICallingEventArgs e)
+        {
+            IPort sourcePort = port;
+            IPort targetPort = _onConnection[sourcePort];
+            
+            Console.WriteLine(
+                "Station: port[{0}] transfer reject from terminal {1} to terminal {2}.\n",
+                sourcePort.PortId, e.SourceNumber, e.TargetNumber);
+
+            targetPort.PortReciveReject(targetPort, e);
+        }
+
+        private void HandleRejectRequestFromTargetTerminal(IPort port, ICallingEventArgs e)
+        {
+            IPort sourcePort = _onConnection.FirstOrDefault(x => x.Value == port).Key;
+            IPort targetPort = port;
+
+            Console.WriteLine(
+                "Station: port[{0}] transfer reject from terminal {2} to terminal {1}.\n",
+                targetPort.PortId, e.SourceNumber, e.TargetNumber);
+
+            sourcePort.PortReciveReject(sourcePort, e);
         }
     }
 }
