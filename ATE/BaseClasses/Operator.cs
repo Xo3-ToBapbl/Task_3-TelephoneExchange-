@@ -11,26 +11,36 @@ namespace ATE.BaseClasses
 {
     public class Operator
     {
-        private IDictionary<Guid, IContract> _contracts;
+        private IDictionary<int, IContract> _contracts;
         private IStation _station;
 
         public Operator(IStation station)
         {
-            _contracts = new Dictionary<Guid, IContract>();
+            _contracts = new Dictionary<int, IContract>();
             _station = station;
         }
 
         public void SignContract(string firstName, string lastName, int terminalNumber, TariffOption tariff)
         {
             IContract newContract = new Contract(firstName, lastName, terminalNumber, tariff, DateTime.Now);
-            Guid id = Guid.NewGuid();
 
-            _contracts[id] = newContract;
+            _contracts[terminalNumber] = newContract;
             ITerminal newTerminal = ProduseTerminal(terminalNumber);
             IPort newPort = ProdusePort(newTerminal);
 
-            _station.AddTerminal(newTerminal);
-            _station.AddMapItem(terminalNumber, newPort);
+            //_station.AddTerminal(newTerminal);
+            _station.AddMapItem(terminalNumber, newPort, newTerminal);
+        }
+
+        public void AbrogateContract(int terminalNumber)
+        {
+            if (_contracts.Keys.Contains(terminalNumber))
+            {
+                IContract contract = _contracts[terminalNumber];
+                contract.AbrogateDate = DateTime.Now;
+
+                _station.RemoveMapItem(terminalNumber);
+            }
         }
 
         private ITerminal ProduseTerminal(int number)

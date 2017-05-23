@@ -21,5 +21,7 @@ namespace ATE.Interfaces
         void PortReciveCall(object sender, ICallingEventArgs e);
         void PortReciveAnswer(object sender, ICallingEventArgs e);
         void PortReciveReject(object sender, ICallingEventArgs e);
+
+        void ExemptPort();
     }
 }

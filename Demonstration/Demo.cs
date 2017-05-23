@@ -39,13 +39,9 @@ namespace Demonstration
             #endregion
 
             #region Tests: 
-            terminal_1.Connect();
-            terminal_2.Connect();
+            operator_1.AbrogateContract(111111);
 
-            terminal_1.Call(222222);
-            terminal_2.Answer();
-            terminal_1.Reject();
-            
+            terminal_1.Connect();
             #endregion
             #region Close application
             Console.WriteLine("\nPress any key to close.");

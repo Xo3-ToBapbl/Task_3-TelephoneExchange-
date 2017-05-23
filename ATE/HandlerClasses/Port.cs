@@ -86,7 +86,7 @@ namespace ATE.HandlerClasses
 
         protected virtual void OnPortAnswerSend(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine("Port[p{0}]: transfer answer from {1} to {2}.\n",
+            Console.WriteLine("Port[{0}]: transfer answer from {1} to {2}.\n",
                 this.PortId, e.TargetNumber, e.SourceNumber);
 
             PortAnswerSending?.Invoke(this, e);
@@ -102,8 +102,8 @@ namespace ATE.HandlerClasses
 
         protected virtual void OnPortRejectSend(object sender, ICallingEventArgs e)
         {
-            Console.WriteLine("Port[{0}]: transfer reject from {1} to {2}.\n",
-                this.PortId, e.TargetNumber, e.SourceNumber);
+            Console.WriteLine("Port[{0}]: transfer reject.\n",
+                this.PortId);
 
             this.State = PortStates.Free;
             PortRejectSending?.Invoke(this, e);
@@ -132,7 +132,7 @@ namespace ATE.HandlerClasses
             this.PortRejectReciving += _terminal.SetConnectedState;
         }
 
-        private void SetStateDisabled(object obj, EventArgs args)
+        private void SetStateDisabled(object sender, EventArgs args)
         {
             this.State = PortStates.Disabled;
 
@@ -160,6 +160,17 @@ namespace ATE.HandlerClasses
         public void PortReciveReject(object sender, ICallingEventArgs e)
         {
             OnPortRejectRecive(sender, e);
+        }
+
+        public void ExemptPort()
+        {
+            SetStateDisabled(this, null);
+
+            _terminal.Disconect();
+
+            _terminal.Connecting -= this.SetStateFree;
+            _terminal.Disconnecting -= this.SetStateDisabled;
+            
         }
     }
 }

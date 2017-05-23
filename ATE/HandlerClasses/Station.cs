@@ -13,7 +13,8 @@ namespace ATE.HandlerClasses
     {
         public Station()
         {
-            _mapping = new Dictionary<int, IPort>();
+            _portMapping = new Dictionary<int, IPort>();
+            _terminalMapping = new Dictionary<int, ITerminal>();
             _waitingConnection = new Dictionary<IPort, IPort>();
             _onConnection = new Dictionary<IPort, IPort>();
             _terminals = new List<ITerminal>();
@@ -22,7 +23,8 @@ namespace ATE.HandlerClasses
 
         private IList<ITerminal> _terminals;
         private IList<IPort> _ports;
-        private IDictionary<int, IPort> _mapping;
+        private IDictionary<int, ITerminal> _terminalMapping;
+        private IDictionary<int, IPort> _portMapping;               // key - number, value - port
         private IDictionary<IPort, IPort> _waitingConnection;   // key - who call, value - whom call
         private IDictionary<IPort, IPort> _onConnection;        // key - who call, value - whom call
 
@@ -42,7 +44,7 @@ namespace ATE.HandlerClasses
             }
         }
 
-        public void AddMapItem(int number, IPort port)
+        public void AddMapItem(int number, IPort port, ITerminal terminal)
         {
             port.PortStateChanging += this.DetectChanges;
             port.PortCallSending += this.HandlePortCallRequest;
@@ -50,15 +52,35 @@ namespace ATE.HandlerClasses
             port.PortRejectSending += this.HandlePortRejectRequest;
 
             _ports.Add(port);
-            _mapping[number] = port;
-        }
+            _portMapping[number] = port;
 
-        public void AddTerminal(ITerminal terminal)
-        {
             _terminals.Add(terminal);
+            _terminalMapping[number] = terminal;
         }
 
+        public void RemoveMapItem(int number)
+        {
+            
+            IPort port = _portMapping[number];
+            if (port.State != PortStates.Busy)
+            {
+                ITerminal terminal = _terminalMapping[number];
 
+                port.ExemptPort();
+
+                port.PortStateChanging -= this.DetectChanges;
+                port.PortCallSending -= this.HandlePortCallRequest;
+                port.PortAnswerSending -= this.HandlePortAnswerRequest;
+                port.PortRejectSending -= this.HandlePortRejectRequest;
+
+                _terminals.Remove(terminal);
+                _ports.Remove(port);
+                _portMapping.Remove(number);
+                _terminalMapping.Remove(number);
+            }
+        }
+
+        
         public void DetectChanges(object sender, PortStates state)
         {
             //Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
@@ -67,21 +89,35 @@ namespace ATE.HandlerClasses
 
         private void HandlePortCallRequest(object sender, ICallingEventArgs e)
         {
-            if (_mapping.ContainsKey(e.TargetNumber))
+            IPort sourcePort = sender as IPort;
+
+            if (_portMapping.ContainsKey(e.TargetNumber))
             {
-                Console.WriteLine(
-                "Station: port[{0}] transfer call from terminal {1} to terminal {2}.\n",
-                (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
-
-                IPort sourcePort = sender as IPort;
-                IPort targetPort = _mapping[e.TargetNumber];
-
-                _waitingConnection[sourcePort] = targetPort;
+                IPort targetPort = _portMapping[e.TargetNumber];
 
                 if (targetPort.State == PortStates.Free)
                 {
+                    Console.WriteLine("Station: port[{0}] transfer call from terminal {1} to terminal {2}.\n",
+                        sourcePort.PortId, e.SourceNumber, e.TargetNumber);
+
+                    _waitingConnection[sourcePort] = targetPort;
                     targetPort.PortReciveCall(targetPort, e);
                 }
+                else
+                {
+                    Console.WriteLine(
+                        "Station to port[{0}]: call from terminal {1} to terminal {2} turn dowm. Terminal busy or disconected.\n",
+                        sourcePort.PortId, e.SourceNumber, e.TargetNumber);
+
+                    sourcePort.PortReciveReject(sourcePort, e);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Station to port[{0}]: invalid target number, or number is not exist.\n", 
+                    sourcePort.PortId);
+
+                sourcePort.PortReciveReject(sourcePort, e);
             }
         }
 
@@ -92,7 +128,7 @@ namespace ATE.HandlerClasses
                 (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
 
             IPort targetPort = sender as IPort;
-            IPort sourcePort = _mapping[e.SourceNumber];
+            IPort sourcePort = _portMapping[e.SourceNumber];
 
             if (sourcePort.State == PortStates.Busy)
             {
@@ -143,6 +179,7 @@ namespace ATE.HandlerClasses
                 "Station: port[{0}] transfer reject from terminal {1} to terminal {2}.\n",
                 sourcePort.PortId, e.SourceNumber, e.TargetNumber);
 
+            _onConnection.Remove(sourcePort);
             targetPort.PortReciveReject(targetPort, e);
         }
 
@@ -155,6 +192,7 @@ namespace ATE.HandlerClasses
                 "Station: port[{0}] transfer reject from terminal {2} to terminal {1}.\n",
                 targetPort.PortId, e.SourceNumber, e.TargetNumber);
 
+            _onConnection.Remove(sourcePort);
             sourcePort.PortReciveReject(sourcePort, e);
         }
     }

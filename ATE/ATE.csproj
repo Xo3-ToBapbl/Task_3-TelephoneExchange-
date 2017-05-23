@@ -57,6 +57,7 @@
     <Compile Include="Interfaces\IStation.cs" />
     <Compile Include="Interfaces\ISubscriber.cs" />
     <Compile Include="Interfaces\ITerminal.cs" />
+    <Compile Include="Interfaces\IUnsubscribeEvents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

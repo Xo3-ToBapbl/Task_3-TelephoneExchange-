@@ -85,8 +85,11 @@ namespace ATE.HandlerClasses
 
         public void Connect()
         {
-            State = TerminalStates.Connected;
-            OnConnecting(this, null);
+            if (Connecting != null)
+            {
+                State = TerminalStates.Connected;
+                OnConnecting(this, null);
+            }
         }   
 
         public void Disconect()
@@ -99,8 +102,15 @@ namespace ATE.HandlerClasses
         {
             if (State == TerminalStates.Connected)
             {
-                State = TerminalStates.OutgoingCall;
-                OnCalling(targetNumber);
+                if (targetNumber != this.Number)
+                {
+                    State = TerminalStates.OutgoingCall;
+                    OnCalling(targetNumber);
+                }
+                else
+                {
+                    Console.WriteLine("Terminal {0}: You are trying to call yourself!", this.Number);
+                }
             }
         }
 
