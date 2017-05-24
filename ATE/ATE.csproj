@@ -42,9 +42,10 @@
   <ItemGroup>
     <Compile Include="BaseClasses\Contract.cs" />
     <Compile Include="BaseClasses\Operator.cs" />
+    <Compile Include="BaseClasses\Statistic.cs" />
+    <Compile Include="Enums\CallStats.cs" />
     <Compile Include="Enums\TerminalStates.cs" />
-    <Compile Include="EventArgsClasses\PortTransferCallEventArgs.cs" />
-    <Compile Include="EventArgsClasses\TerminalCallEventArgs.cs" />
+    <Compile Include="EventArgsClasses\CallEventArgs.cs" />
     <Compile Include="HandlerClasses\Port.cs" />
     <Compile Include="HandlerClasses\Station.cs" />
     <Compile Include="BaseClasses\Subscriber.cs" />
