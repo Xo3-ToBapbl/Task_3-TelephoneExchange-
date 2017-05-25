@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{221480D5-F240-4255-8B46-CC91391539BA}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{3973745C-968B-4C2D-83BC-FE14A6875110}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Demonstration</RootNamespace>
-    <AssemblyName>Demonstration</AssemblyName>
+    <RootNamespace>Base</RootNamespace>
+    <AssemblyName>Base</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -43,23 +40,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Demo.cs" />
+    <Compile Include="Operator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Compile Include="Subscriber.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ATE\ATE.csproj">
       <Project>{faa02791-0345-4372-844a-c967796ea546}</Project>
       <Name>ATE</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Base\Base.csproj">
-      <Project>{3973745c-968b-4c2d-83bc-fe14a6875110}</Project>
-      <Name>Base</Name>
-    </ProjectReference>
     <ProjectReference Include="..\BillingSystem\BillingSystem.csproj">
-      <Project>{C053A70E-D54C-400D-A4EF-5A1736427AFF}</Project>
+      <Project>{c053a70e-d54c-400d-a4ef-5a1736427aff}</Project>
       <Name>BillingSystem</Name>
     </ProjectReference>
   </ItemGroup>

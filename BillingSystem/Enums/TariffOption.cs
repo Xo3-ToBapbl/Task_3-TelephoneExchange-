@@ -4,10 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATE.Interfaces
+namespace BillingSystem.Enums
 {
-    interface IUnsubscribeEvents
+    public enum TariffOption
     {
-        void UnsubscribeEvents();
+        Easy,
+        Standart
     }
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ATE.HandlerClasses
@@ -100,6 +101,7 @@ namespace ATE.HandlerClasses
 
         public void Call(int targetNumber)
         {
+            Thread.Sleep(10);
             if (State == TerminalStates.Connected)
             {
                 if (targetNumber != this.Number)

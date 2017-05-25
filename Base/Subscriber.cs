@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATE.BaseClasses
+namespace Base
 {
-    public class Subscriber: ISubscriber
+    public class Subscriber
     {
         public Subscriber(string firstName, string lastName)
         {

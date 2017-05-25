@@ -1,17 +1,17 @@
-﻿using ATE.Enums;
-using ATE.Interfaces;
+﻿using BillingSystem.Enums;
+using BillingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ATE.BaseClasses
+namespace BillingSystem.Classes
 {
     public class Contract : IContract
     {
-        public Contract(
-            string firstName, string lastName, int terminalNumber, TariffOption tariff, DateTime signDate)
+        public Contract(string firstName, string lastName, int terminalNumber, 
+            TariffOption tariff, DateTime signDate)
         {
             SubscriberFirstName = firstName;
             SubscriberLastName = lastName;
@@ -19,6 +19,8 @@ namespace ATE.BaseClasses
             Tariff = tariff;
             SignDate = signDate; 
         }
+
+        private DateTime TariffUpdateDate = new DateTime(1, 1, 1);
 
         public string SubscriberFirstName { get; set; }
 
@@ -31,5 +33,19 @@ namespace ATE.BaseClasses
         public DateTime SignDate { get; set; }
 
         public DateTime AbrogateDate { get; set; }
+
+
+        public void ChangeTariff(TariffOption tariff)
+        {
+            if (TariffUpdateDate <= DateTime.Now.AddMonths(-1))
+            {
+                Tariff = tariff;
+                Console.WriteLine("Tariff successfully change.");
+            }
+            else
+            {
+                Console.WriteLine("Tariff already changed in this month.");
+            }
+        }
     }
 }

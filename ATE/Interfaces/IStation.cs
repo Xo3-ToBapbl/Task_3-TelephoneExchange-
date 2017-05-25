@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BillingSystem.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,5 +13,6 @@ namespace ATE.Interfaces
         void RemoveMapItem(int number);
         IList<ITerminal> Terminals { get; }
         IList<IPort> Ports { get; }
+        IBilling Billing { set; }
     }
 }

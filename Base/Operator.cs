@@ -1,42 +1,40 @@
-﻿using ATE.Enums;
-using ATE.HandlerClasses;
+﻿using ATE.HandlerClasses;
 using ATE.Interfaces;
+using BillingSystem.Enums;
+using BillingSystem.Interfaces;
+using BillingSystem.Classes;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ATE.BaseClasses
+namespace Base
 {
     public class Operator
     {
-        private IDictionary<int, IContract> _contracts;
         private IStation _station;
+        private IBilling _billing;
 
-        public Operator(IStation station)
+        public Operator(IStation station, IBilling billing)
         {
-            _contracts = new Dictionary<int, IContract>();
             _station = station;
+            _billing = billing;
+            _station.Billing = billing;
         }
 
         public void SignContract(string firstName, string lastName, int terminalNumber, TariffOption tariff)
         {
             IContract newContract = new Contract(firstName, lastName, terminalNumber, tariff, DateTime.Now);
-
-            _contracts[terminalNumber] = newContract;
             ITerminal newTerminal = ProduseTerminal(terminalNumber);
             IPort newPort = ProdusePort(newTerminal);
 
-            //_station.AddTerminal(newTerminal);
+            _billing.Add(terminalNumber, newContract);
             _station.AddMapItem(terminalNumber, newPort, newTerminal);
         }
 
         public void AbrogateContract(int terminalNumber)
         {
-            if (_contracts.Keys.Contains(terminalNumber))
+            if (_billing.Contracts.Keys.Contains(terminalNumber))
             {
-                IContract contract = _contracts[terminalNumber];
+                IContract contract = _billing.Contracts[terminalNumber];
                 contract.AbrogateDate = DateTime.Now;
 
                 _station.RemoveMapItem(terminalNumber);

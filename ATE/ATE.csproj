@@ -40,26 +40,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseClasses\Contract.cs" />
-    <Compile Include="BaseClasses\Operator.cs" />
-    <Compile Include="BaseClasses\Statistic.cs" />
     <Compile Include="Enums\CallStats.cs" />
     <Compile Include="Enums\TerminalStates.cs" />
     <Compile Include="EventArgsClasses\CallEventArgs.cs" />
     <Compile Include="HandlerClasses\Port.cs" />
     <Compile Include="HandlerClasses\Station.cs" />
-    <Compile Include="BaseClasses\Subscriber.cs" />
     <Compile Include="Enums\PortStates.cs" />
     <Compile Include="HandlerClasses\Terminal.cs" />
-    <Compile Include="Enums\TariffOption.cs" />
     <Compile Include="Interfaces\ICallingEventArgs.cs" />
-    <Compile Include="Interfaces\IContract.cs" />
     <Compile Include="Interfaces\IPort.cs" />
     <Compile Include="Interfaces\IStation.cs" />
-    <Compile Include="Interfaces\ISubscriber.cs" />
     <Compile Include="Interfaces\ITerminal.cs" />
-    <Compile Include="Interfaces\IUnsubscribeEvents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BillingSystem\BillingSystem.csproj">
+      <Project>{c053a70e-d54c-400d-a4ef-5a1736427aff}</Project>
+      <Name>BillingSystem</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,6 +1,8 @@
 ﻿using ATE.Enums;
 using ATE.EventArgsClasses;
 using ATE.Interfaces;
+using BillingSystem.Classes;
+using BillingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +13,10 @@ namespace ATE.HandlerClasses
 {
     public class Station: IStation
     {
+        private static Random random = new Random();
+
+        private IBilling _billing;
+        
         public Station()
         {
             _portMapping = new Dictionary<int, IPort>();
@@ -43,6 +49,15 @@ namespace ATE.HandlerClasses
                 return _ports;
             }
         }
+
+        public IBilling Billing
+        {
+            set
+            {
+                _billing = value;
+            }
+        }
+
 
         public void AddMapItem(int number, IPort port, ITerminal terminal)
         {
@@ -86,6 +101,7 @@ namespace ATE.HandlerClasses
             //Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
                 //(sender as IPort).PortId, state);
         }
+
 
         private void HandlePortCallRequest(object sender, ICallingEventArgs e)
         {
@@ -149,16 +165,20 @@ namespace ATE.HandlerClasses
             else if (_onConnection.Keys.Contains(port))
             {
                 HandleRejectRequestFromSourceTerminal(port, e);
+                CreateStats(e);
             }
             else if (_onConnection.Values.Contains(port))
             {
                 HandleRejectRequestFromTargetTerminal(port, e);
+                CreateStats(e);
             }
         }
 
         
         private void HandleIgnoreRequest(IPort port, ICallingEventArgs e)
-        {// Ignore request only from 'target' terminal
+        {
+            // Ignore request only from 'target' terminal
+
             IPort targetPort = port;
             IPort sourcePort = _waitingConnection.FirstOrDefault(x => x.Value == port).Key;
             _waitingConnection.Remove(sourcePort);
@@ -194,6 +214,21 @@ namespace ATE.HandlerClasses
 
             _onConnection.Remove(sourcePort);
             sourcePort.PortReciveReject(sourcePort, e);
+        }
+
+
+        private void CreateStats(ICallingEventArgs e)
+        {
+            TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
+            DateTime day = DateTime.Now.AddDays(random.Next(0, 10));
+
+            Statistic sourceStat = new Statistic(e.SourceNumber, e.TargetNumber, 
+                CallStats.OutgoingCall.ToString(), day, callSpan);
+            Statistic targetStat = new Statistic(e.TargetNumber, e.SourceNumber,
+                CallStats.IncomingCall.ToString(), day, callSpan);
+
+            _billing.AddStats(e.SourceNumber, sourceStat);
+            _billing.AddStats(e.TargetNumber, targetStat);
         }
     }
 }
