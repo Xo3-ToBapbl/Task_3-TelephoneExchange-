@@ -4,7 +4,6 @@ using BillingSystem.Enums;
 using BillingSystem.Interfaces;
 using BillingSystem.Classes;
 using System;
-using System.Collections.Generic;
 
 namespace Base
 {
@@ -19,6 +18,7 @@ namespace Base
             _billing = billing;
             _station.Billing = billing;
         }
+
 
         public void SignContract(string firstName, string lastName, int terminalNumber, TariffOption tariff)
         {

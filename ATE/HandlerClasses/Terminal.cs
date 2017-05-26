@@ -2,25 +2,22 @@
 using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace ATE.HandlerClasses
 {
     public class Terminal : ITerminal
     {
+        private int _number;
+        private TerminalStates _state;
+        private ICallingEventArgs _e;
+
         public Terminal(int number)
         {
             _number = number;
         }
 
-        private int _number;
-        private TerminalStates _state;
-        private ICallingEventArgs _e;
-
+        
         public int Number
         {
             get

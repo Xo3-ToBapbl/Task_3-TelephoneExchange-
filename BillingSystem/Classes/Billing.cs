@@ -18,6 +18,7 @@ namespace BillingSystem.Classes
             _statistics = new Dictionary<int, ICollection<IStatistic>>();
         }
 
+
         public IDictionary<int, IContract> Contracts
         {
             get

@@ -42,11 +42,19 @@
   <ItemGroup>
     <Compile Include="Classes\Billing.cs" />
     <Compile Include="Classes\Contract.cs" />
-    <Compile Include="Classes\Statistic.cs" />
+    <Compile Include="Classes\Statistics\IncomingCallStatistic.cs" />
+    <Compile Include="Classes\Statistics\MissedCallStatistic.cs" />
+    <Compile Include="Classes\Statistics\NotCalledStatistic.cs" />
+    <Compile Include="Classes\Statistics\OutGoingCallStatistic.cs" />
+    <Compile Include="Classes\Statistics\Statistic.cs" />
     <Compile Include="Interfaces\IBilling.cs" />
     <Compile Include="Interfaces\IContract.cs" />
     <Compile Include="Enums\TariffOption.cs" />
+    <Compile Include="Interfaces\IIncomingCallStatistic.cs" />
+    <Compile Include="Interfaces\IMissedCallStatistic.cs" />
+    <Compile Include="Interfaces\INotCalledStatistic.cs" />
     <Compile Include="Interfaces\IStatistic.cs" />
+    <Compile Include="Interfaces\IOutgoingCallStatistic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

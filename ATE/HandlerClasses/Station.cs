@@ -1,22 +1,25 @@
 ﻿using ATE.Enums;
-using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using BillingSystem.Classes;
+using BillingSystem.Classes.Statistics;
 using BillingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ATE.HandlerClasses
 {
     public class Station: IStation
     {
         private static Random random = new Random();
-
         private IBilling _billing;
-        
+        private IList<ITerminal> _terminals;
+        private IList<IPort> _ports;
+        private IDictionary<int, ITerminal> _terminalMapping;
+        private IDictionary<int, IPort> _portMapping;
+        private IDictionary<IPort, IPort> _waitingConnection;   // key - who call, value - whom call
+        private IDictionary<IPort, IPort> _onConnection;        // key - who call, value - whom call
+
         public Station()
         {
             _portMapping = new Dictionary<int, IPort>();
@@ -27,13 +30,7 @@ namespace ATE.HandlerClasses
             _ports = new List<IPort>();
         }
 
-        private IList<ITerminal> _terminals;
-        private IList<IPort> _ports;
-        private IDictionary<int, ITerminal> _terminalMapping;
-        private IDictionary<int, IPort> _portMapping;               // key - number, value - port
-        private IDictionary<IPort, IPort> _waitingConnection;   // key - who call, value - whom call
-        private IDictionary<IPort, IPort> _onConnection;        // key - who call, value - whom call
-
+        
         public IList<ITerminal> Terminals
         {
             get
@@ -161,16 +158,17 @@ namespace ATE.HandlerClasses
             if (_waitingConnection.Values.Contains(port))
             {
                 HandleIgnoreRequest(port, e);
+                CreateUnsuccessfulStats(e);
             }
             else if (_onConnection.Keys.Contains(port))
             {
                 HandleRejectRequestFromSourceTerminal(port, e);
-                CreateStats(e);
+                CreateSuccessfulStats(e);
             }
             else if (_onConnection.Values.Contains(port))
             {
                 HandleRejectRequestFromTargetTerminal(port, e);
-                CreateStats(e);
+                CreateSuccessfulStats(e);
             }
         }
 
@@ -217,15 +215,25 @@ namespace ATE.HandlerClasses
         }
 
 
-        private void CreateStats(ICallingEventArgs e)
+        private void CreateSuccessfulStats(ICallingEventArgs e)
         {
             TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
             DateTime day = DateTime.Now.AddDays(random.Next(0, 10));
 
-            Statistic sourceStat = new Statistic(e.SourceNumber, e.TargetNumber, 
-                CallStats.OutgoingCall.ToString(), day, callSpan);
-            Statistic targetStat = new Statistic(e.TargetNumber, e.SourceNumber,
-                CallStats.IncomingCall.ToString(), day, callSpan);
+            IStatistic sourceStat = new OutgoingCallStatistic(day, callSpan, e.TargetNumber);
+            IStatistic targetStat = new IncomingCallStatistic(day, callSpan, e.SourceNumber);
+
+            _billing.AddStats(e.SourceNumber, sourceStat);
+            _billing.AddStats(e.TargetNumber, targetStat);
+        }
+
+        private void CreateUnsuccessfulStats(ICallingEventArgs e)
+        {
+            TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
+            DateTime day = DateTime.Now.AddDays(random.Next(0, 10));
+
+            IStatistic sourceStat = new NotCalledStatistic(day, e.TargetNumber);
+            IStatistic targetStat = new MissedCallStatistic(day, e.SourceNumber);
 
             _billing.AddStats(e.SourceNumber, sourceStat);
             _billing.AddStats(e.TargetNumber, targetStat);

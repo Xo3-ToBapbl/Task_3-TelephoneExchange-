@@ -1,11 +1,6 @@
 ﻿using ATE.Enums;
-using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ATE.HandlerClasses
 {
@@ -23,6 +18,7 @@ namespace ATE.HandlerClasses
             _terminal.Connecting += this.SetStateFree;
             _terminal.Disconnecting += this.SetStateDisabled;
         }
+
 
         public PortStates State
         {

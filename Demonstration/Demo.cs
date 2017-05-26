@@ -43,7 +43,6 @@ namespace Demonstration
             terminal_2.Answer();
             terminal_1.Reject();
             terminal_2.Call(111111);
-            terminal_1.Answer();
             terminal_1.Reject();
             #endregion
             #region Close application
