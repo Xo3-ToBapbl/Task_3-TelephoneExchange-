@@ -41,13 +41,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\Billing.cs" />
+    <Compile Include="Classes\BillingTariffs\FreeAtNightTariff.cs" />
+    <Compile Include="Classes\BillingTariffs\FreeMinutesTariff.cs" />
+    <Compile Include="Classes\SubscriberInfo.cs" />
     <Compile Include="Classes\Contract.cs" />
     <Compile Include="Classes\Statistics\IncomingCallStatistic.cs" />
     <Compile Include="Classes\Statistics\MissedCallStatistic.cs" />
     <Compile Include="Classes\Statistics\NotCalledStatistic.cs" />
     <Compile Include="Classes\Statistics\OutGoingCallStatistic.cs" />
     <Compile Include="Classes\Statistics\Statistic.cs" />
+    <Compile Include="Extensions\TimeSpanExtensions.cs" />
     <Compile Include="Interfaces\IBilling.cs" />
+    <Compile Include="Interfaces\IBillingTariff.cs" />
     <Compile Include="Interfaces\IContract.cs" />
     <Compile Include="Enums\TariffOption.cs" />
     <Compile Include="Interfaces\IIncomingCallStatistic.cs" />

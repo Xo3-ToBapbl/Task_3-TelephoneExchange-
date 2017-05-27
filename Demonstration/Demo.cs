@@ -23,9 +23,9 @@ namespace Demonstration
             Operator operator_ = new Operator(station, billing);
 
             #region Contracts:
-            operator_.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.Easy);
-            operator_.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.Standart);
-            operator_.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.Easy);
+            operator_.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.FreeMinutesEasy);
+            operator_.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.FreeMinutesStandart);
+            operator_.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.FreeMinutesEasy);
             #endregion
             #region Terminals, ports:
             IPort port_1 = station.Ports[0];

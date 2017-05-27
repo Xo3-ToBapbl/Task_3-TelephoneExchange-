@@ -2,7 +2,8 @@
 {
     public enum TariffOption
     {
-        Easy,
-        Standart
+        FreeMinutesEasy,
+        FreeMinutesStandart,
+        FreeAtNight
     }
 }
