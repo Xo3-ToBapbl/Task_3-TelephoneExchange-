@@ -23,7 +23,7 @@ namespace Demonstration
             Operator operator_ = new Operator(station, billing);
 
             #region Contracts:
-            operator_.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.FreeMinutesEasy);
+            operator_.SignContract(subscriber_1.FirstName, subscriber_1.LastName, 111111, TariffOption.FreeAtNight);
             operator_.SignContract(subscriber_2.FirstName, subscriber_2.LastName, 222222, TariffOption.FreeMinutesStandart);
             operator_.SignContract(subscriber_3.FirstName, subscriber_3.LastName, 333333, TariffOption.FreeMinutesEasy);
             #endregion
@@ -35,15 +35,38 @@ namespace Demonstration
             ITerminal terminal_1 = station.Terminals[0];
             ITerminal terminal_2 = station.Terminals[1];
             ITerminal terminal_3 = station.Terminals[2];
-            #endregion
-            #region Tests:
+
             terminal_1.Connect();
             terminal_2.Connect();
+            terminal_3.Connect();
+            #endregion
+            #region Tests:
+            terminal_1.Call(222222);
+            terminal_2.Reject();
+           
+
+            terminal_2.Call(111111);
+            terminal_1.Reject();
+
+            terminal_2.Call(333333);
+            terminal_3.Answer();
+            terminal_3.Reject();
+
+            terminal_1.Call(333333);
+            terminal_3.Answer();
+            terminal_3.Reject();
+
             terminal_1.Call(222222);
             terminal_2.Answer();
             terminal_1.Reject();
-            terminal_2.Call(111111);
-            terminal_1.Reject();
+
+            billing.GetFullStatistic(111111);
+            billing.GetFilteredStatistics(
+                filter: StatisticFilters.Abonent, 
+                number: 111111,
+                targetNumber: 222222);
+
+
             #endregion
             #region Close application
             Console.WriteLine("\nPress any key to close.");

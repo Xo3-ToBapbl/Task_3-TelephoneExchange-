@@ -98,7 +98,7 @@ namespace ATE.HandlerClasses
 
         public void Call(int targetNumber)
         {
-            Thread.Sleep(10);
+            Thread.Sleep(500);
             if (State == TerminalStates.Connected)
             {
                 if (targetNumber != this.Number)

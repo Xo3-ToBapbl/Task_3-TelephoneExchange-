@@ -4,7 +4,7 @@ namespace BillingSystem.Interfaces
 {
     public interface IOutgoingCallStatistic: INotCalledStatistic
     {
-        int Cost { get; }
+        int Cost { get; set; }
         TimeSpan Span { get; }
     }
 }

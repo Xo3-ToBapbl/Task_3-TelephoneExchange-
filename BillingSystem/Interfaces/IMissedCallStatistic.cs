@@ -1,6 +1,6 @@
 ﻿namespace BillingSystem.Interfaces
 {
-    public interface IMissedCallStatistic
+    public interface IMissedCallStatistic: IStatistic
     {
         int SourceNumber { get; }
     }

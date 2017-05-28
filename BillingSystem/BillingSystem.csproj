@@ -50,6 +50,7 @@
     <Compile Include="Classes\Statistics\NotCalledStatistic.cs" />
     <Compile Include="Classes\Statistics\OutGoingCallStatistic.cs" />
     <Compile Include="Classes\Statistics\Statistic.cs" />
+    <Compile Include="Enums\StatisticFilters.cs" />
     <Compile Include="Extensions\TimeSpanExtensions.cs" />
     <Compile Include="Interfaces\IBilling.cs" />
     <Compile Include="Interfaces\IBillingTariff.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Interfaces\INotCalledStatistic.cs" />
     <Compile Include="Interfaces\IStatistic.cs" />
     <Compile Include="Interfaces\IOutgoingCallStatistic.cs" />
+    <Compile Include="Interfaces\ISubscriberInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

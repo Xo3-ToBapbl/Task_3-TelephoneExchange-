@@ -13,7 +13,7 @@ namespace BillingSystem.Classes
             base.CallState = "OutgoingCall";
         }
 
-        public int Cost { get; }
+        public int Cost { get; set; }
 
         public TimeSpan Span { get; }
 

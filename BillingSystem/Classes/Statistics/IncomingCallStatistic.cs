@@ -13,8 +13,6 @@ namespace BillingSystem.Classes.Statistics
             base.CallState = "IncomingCall";
         }
 
-        public int Cost { get; }
-
         public TimeSpan Span { get; }
 
         public int SourceNumber { get; }

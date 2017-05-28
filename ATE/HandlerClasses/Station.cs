@@ -17,8 +17,8 @@ namespace ATE.HandlerClasses
         private IList<IPort> _ports;
         private IDictionary<int, ITerminal> _terminalMapping;
         private IDictionary<int, IPort> _portMapping;
-        private IDictionary<IPort, IPort> _waitingConnection;   // key - who call, value - whom call
-        private IDictionary<IPort, IPort> _onConnection;        // key - who call, value - whom call
+        private IDictionary<IPort, IPort> _waitingConnection;   
+        private IDictionary<IPort, IPort> _onConnection;        
 
         public Station()
         {
@@ -218,7 +218,7 @@ namespace ATE.HandlerClasses
         private void CreateSuccessfulStats(ICallingEventArgs e)
         {
             TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
-            DateTime day = DateTime.Now.AddDays(random.Next(0, 10));
+            DateTime day = DateTime.Now.AddDays(random.Next(0, 5));
 
             IStatistic sourceStat = new OutgoingCallStatistic(day, callSpan, e.TargetNumber);
             IStatistic targetStat = new IncomingCallStatistic(day, callSpan, e.SourceNumber);
@@ -230,7 +230,7 @@ namespace ATE.HandlerClasses
         private void CreateUnsuccessfulStats(ICallingEventArgs e)
         {
             TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
-            DateTime day = DateTime.Now.AddDays(random.Next(0, 10));
+            DateTime day = DateTime.Now.AddDays(random.Next(0, 5));
 
             IStatistic sourceStat = new NotCalledStatistic(day, e.TargetNumber);
             IStatistic targetStat = new MissedCallStatistic(day, e.SourceNumber);
