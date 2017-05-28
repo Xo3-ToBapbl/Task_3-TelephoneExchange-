@@ -11,14 +11,14 @@ namespace ATE.HandlerClasses
 {
     public class Station: IStation
     {
-        private static Random random = new Random();
+        private Random random = new Random();
+        private DateTime _day;
+        private TimeSpan _callSpan;
         private IBilling _billing;
-        private IList<ITerminal> _terminals;
-        private IList<IPort> _ports;
         private IDictionary<int, ITerminal> _terminalMapping;
         private IDictionary<int, IPort> _portMapping;
         private IDictionary<IPort, IPort> _waitingConnection;   
-        private IDictionary<IPort, IPort> _onConnection;        
+        private IDictionary<IPort, IPort> _onConnection;
 
         public Station()
         {
@@ -26,26 +26,8 @@ namespace ATE.HandlerClasses
             _terminalMapping = new Dictionary<int, ITerminal>();
             _waitingConnection = new Dictionary<IPort, IPort>();
             _onConnection = new Dictionary<IPort, IPort>();
-            _terminals = new List<ITerminal>();
-            _ports = new List<IPort>();
         }
 
-        
-        public IList<ITerminal> Terminals
-        {
-            get
-            {
-                return _terminals;
-            }
-        }
-
-        public IList<IPort> Ports
-        {
-            get
-            {
-                return _ports;
-            }
-        }
 
         public IBilling Billing
         {
@@ -56,6 +38,19 @@ namespace ATE.HandlerClasses
         }
 
 
+        public ITerminal ReturnTerminal(int number)
+        {
+            if (_terminalMapping.ContainsKey(number))
+            {
+                return _terminalMapping[number];
+            }
+            else
+            {
+                Console.WriteLine("Terminal with number {0} does not exist.");
+                return null;
+            }
+        }
+
         public void AddMapItem(int number, IPort port, ITerminal terminal)
         {
             port.PortStateChanging += this.DetectChanges;
@@ -63,10 +58,7 @@ namespace ATE.HandlerClasses
             port.PortAnswerSending += this.HandlePortAnswerRequest;
             port.PortRejectSending += this.HandlePortRejectRequest;
 
-            _ports.Add(port);
             _portMapping[number] = port;
-
-            _terminals.Add(terminal);
             _terminalMapping[number] = terminal;
         }
 
@@ -85,8 +77,6 @@ namespace ATE.HandlerClasses
                 port.PortAnswerSending -= this.HandlePortAnswerRequest;
                 port.PortRejectSending -= this.HandlePortRejectRequest;
 
-                _terminals.Remove(terminal);
-                _ports.Remove(port);
                 _portMapping.Remove(number);
                 _terminalMapping.Remove(number);
             }
@@ -123,6 +113,7 @@ namespace ATE.HandlerClasses
                         sourcePort.PortId, e.SourceNumber, e.TargetNumber);
 
                     sourcePort.PortReciveReject(sourcePort, e);
+                    CreateUnsuccessfulStats(e);
                 }
             }
             else
@@ -139,6 +130,9 @@ namespace ATE.HandlerClasses
             Console.WriteLine(
                 "Station: port[{0}] transfer answer from terminal {2} to terminal {1}. Terminals online.\n",
                 (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
+
+            _callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
+            _day = DateTime.Now.AddDays(random.Next(0, 5));
 
             IPort targetPort = sender as IPort;
             IPort sourcePort = _portMapping[e.SourceNumber];
@@ -217,11 +211,8 @@ namespace ATE.HandlerClasses
 
         private void CreateSuccessfulStats(ICallingEventArgs e)
         {
-            TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
-            DateTime day = DateTime.Now.AddDays(random.Next(0, 5));
-
-            IStatistic sourceStat = new OutgoingCallStatistic(day, callSpan, e.TargetNumber);
-            IStatistic targetStat = new IncomingCallStatistic(day, callSpan, e.SourceNumber);
+            IStatistic sourceStat = new OutgoingCallStatistic(_day, _callSpan, e.TargetNumber);
+            IStatistic targetStat = new IncomingCallStatistic(_day, _callSpan, e.SourceNumber);
 
             _billing.AddStats(e.SourceNumber, sourceStat);
             _billing.AddStats(e.TargetNumber, targetStat);
@@ -229,11 +220,8 @@ namespace ATE.HandlerClasses
 
         private void CreateUnsuccessfulStats(ICallingEventArgs e)
         {
-            TimeSpan callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
-            DateTime day = DateTime.Now.AddDays(random.Next(0, 5));
-
-            IStatistic sourceStat = new NotCalledStatistic(day, e.TargetNumber);
-            IStatistic targetStat = new MissedCallStatistic(day, e.SourceNumber);
+            IStatistic sourceStat = new NotCalledStatistic(_day, e.TargetNumber);
+            IStatistic targetStat = new MissedCallStatistic(_day, e.SourceNumber);
 
             _billing.AddStats(e.SourceNumber, sourceStat);
             _billing.AddStats(e.TargetNumber, targetStat);

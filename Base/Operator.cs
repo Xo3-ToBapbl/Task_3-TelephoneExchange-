@@ -23,13 +23,21 @@ namespace Base
 
         public void SignContract(string firstName, string lastName, int terminalNumber, TariffOption tariffType)
         {
-            IContract newContract = new Contract(firstName, lastName, terminalNumber, tariffType, DateTime.Now);
-            ITerminal newTerminal = ProduseTerminal(terminalNumber);
-            IPort newPort = ProdusePort(newTerminal);
-            ISubscriberInfo subscriberInfo = CreateSubscriberInfo(tariffType, terminalNumber, newContract);
+            if (!_billing.Repository.ContainsKey(terminalNumber))
+            {
+                IContract newContract = new Contract(firstName, lastName, terminalNumber, tariffType, DateTime.Now);
+                ITerminal newTerminal = ProduseTerminal(terminalNumber);
+                IPort newPort = ProdusePort(newTerminal);
+                ISubscriberInfo subscriberInfo = CreateSubscriberInfo(tariffType, terminalNumber, newContract);
 
-            _billing.AddSubscriberInfo(terminalNumber, subscriberInfo);
-            _station.AddMapItem(terminalNumber, newPort, newTerminal);
+                _billing.AddSubscriberInfo(terminalNumber, subscriberInfo);
+                _station.AddMapItem(terminalNumber, newPort, newTerminal);
+            }
+            else
+            {
+                Console.WriteLine("\nThis number alredy used. Please choose another number.\n");
+            }
+            
         }
 
         public void AbrogateContract(int terminalNumber)
@@ -41,7 +49,35 @@ namespace Base
 
                 _station.RemoveMapItem(terminalNumber);
             }
+            else
+            {
+                Console.WriteLine("\nContract with this number does not exist.\n");
+            }
         }
+
+        public void ChangeTariff(int number, TariffOption tariffType)
+        {
+            if (_billing.Repository.ContainsKey(number))
+            {
+                IBillingTariff currentTariff = _billing.Repository[number].Tariff;
+                if (currentTariff.TariffType != tariffType)
+                {
+                    if(_billing.Repository[number].Contract.ChangeTariff(tariffType))
+                    {
+                        _billing.Repository[number].Tariff = CreateTariff(tariffType);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("You alredy used this tariff.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Abonunt with number {0} does not exist.", number);
+            }
+        }
+
 
         private ITerminal ProduseTerminal(int number)
         {
@@ -55,9 +91,16 @@ namespace Base
 
         private ISubscriberInfo CreateSubscriberInfo(TariffOption tariffType, int number, IContract contract)
         {
-            IBillingTariff tariff;
+            IBillingTariff tariff = CreateTariff(tariffType);
+            return new SubscriberInfo(number, tariff, contract);
+        }
 
-            switch(tariffType)
+        
+
+        private IBillingTariff CreateTariff(TariffOption tariffType)
+        {
+            IBillingTariff tariff;
+            switch (tariffType)
             {
                 case TariffOption.FreeAtNight:
                     {
@@ -66,7 +109,7 @@ namespace Base
                     }
                 case TariffOption.FreeMinutesEasy:
                     {
-                        tariff = new FreeMinutesTariff(new TimeSpan(0,50,0), 3, TariffOption.FreeMinutesEasy, 120);
+                        tariff = new FreeMinutesTariff(new TimeSpan(0, 50, 0), 3, TariffOption.FreeMinutesEasy, 120);
                         break;
                     }
                 case TariffOption.FreeMinutesStandart:
@@ -80,8 +123,7 @@ namespace Base
                         break;
                     }
             }
-
-            return new SubscriberInfo(number, tariff, contract);
+            return tariff;
         }
     }
 }

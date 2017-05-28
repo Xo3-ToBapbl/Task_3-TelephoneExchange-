@@ -8,7 +8,7 @@ namespace BillingSystem.Interfaces
 {
     public interface ISubscriberInfo
     {
-        IBillingTariff Tariff { get; }
+        IBillingTariff Tariff { get; set; }
 
         DateTime BillingPeriod { get; }
 

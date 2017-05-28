@@ -35,16 +35,18 @@ namespace BillingSystem.Classes
         public DateTime AbrogateDate { get; set; }
 
 
-        public void ChangeTariff(TariffOption tariff)
+        public bool ChangeTariff(TariffOption tariff)
         {
             if (TariffUpdateDate <= DateTime.Now.AddMonths(-1))
             {
                 Tariff = tariff;
-                Console.WriteLine("Tariff successfully change.");
+                Console.WriteLine("\nTariff successfully change.");
+                return true;
             }
             else
             {
-                Console.WriteLine("Tariff already changed in this month.");
+                Console.WriteLine("\nTariff already changed in this month.");
+                return false;
             }
         }
     }

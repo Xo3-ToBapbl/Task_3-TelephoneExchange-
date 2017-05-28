@@ -52,7 +52,6 @@ namespace ATE.HandlerClasses
         public event EventHandler<ICallingEventArgs> PortRejectSending;
         public event EventHandler<ICallingEventArgs> PortRejectReciving;
 
-
         #region Start event methods:
 
         protected virtual void OnPortStateChanged(object sender, PortStates state)

@@ -16,8 +16,7 @@ namespace ATE.HandlerClasses
         {
             _number = number;
         }
-
-        
+      
         public int Number
         {
             get
@@ -99,6 +98,7 @@ namespace ATE.HandlerClasses
         public void Call(int targetNumber)
         {
             Thread.Sleep(500);
+            Console.WriteLine("\n");
             if (State == TerminalStates.Connected)
             {
                 if (targetNumber != this.Number)
@@ -148,7 +148,7 @@ namespace ATE.HandlerClasses
         {
             if (State == TerminalStates.OutgoingCall || State == TerminalStates.Online)
             {
-                Console.WriteLine("Terminal {0}: call rejected.\n", this.Number, e.TargetNumber);
+                Console.WriteLine("Terminal {0}: call rejected.\n", this.Number);
 
                 State = TerminalStates.Connected;
             }

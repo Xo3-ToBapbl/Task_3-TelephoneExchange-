@@ -23,7 +23,7 @@ namespace BillingSystem.Classes
         }
 
 
-        public IBillingTariff Tariff { get; }
+        public IBillingTariff Tariff { get; set; }
 
         public DateTime BillingPeriod { get; }
 

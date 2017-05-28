@@ -17,5 +17,7 @@ namespace BillingSystem.Interfaces
 
         DateTime AbrogateDate { get; set; }
 
+        bool ChangeTariff(TariffOption tariff);
+
     }
 }
