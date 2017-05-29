@@ -94,7 +94,6 @@ namespace Base
             IBillingTariff tariff = CreateTariff(tariffType);
             return new SubscriberInfo(number, tariff, contract);
         }
-
         
 
         private IBillingTariff CreateTariff(TariffOption tariffType)

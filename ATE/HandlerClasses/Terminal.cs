@@ -2,7 +2,6 @@
 using ATE.EventArgsClasses;
 using ATE.Interfaces;
 using System;
-using System.Threading;
 
 namespace ATE.HandlerClasses
 {
@@ -50,14 +49,14 @@ namespace ATE.HandlerClasses
 
         protected virtual void OnConnecting(object sender, EventArgs args)
         {
-            //Console.WriteLine("Terminal {0}: connected.\n", this.Number);
+            Console.WriteLine("Terminal {0}: connected.\n", this.Number);
 
             Connecting?.Invoke(sender, args);
         }
 
         protected virtual void OnDisconnecting(object sender, EventArgs args)
         {
-            //Console.WriteLine("Terminal {0}: disconnected.\n", this.Number);
+            Console.WriteLine("\nTerminal {0}: disconnected.\n", this.Number);
 
             Disconnecting?.Invoke(sender, args);
         }
@@ -97,7 +96,6 @@ namespace ATE.HandlerClasses
 
         public void Call(int targetNumber)
         {
-            Thread.Sleep(500);
             Console.WriteLine("\n");
             if (State == TerminalStates.Connected)
             {
@@ -110,6 +108,10 @@ namespace ATE.HandlerClasses
                 {
                     Console.WriteLine("Terminal {0}: You are trying to call yourself!", this.Number);
                 }
+            }
+            else
+            {
+                Console.WriteLine("Terminal {0}: please, connect me before calling!", this.Number);
             }
         }
 
@@ -132,6 +134,10 @@ namespace ATE.HandlerClasses
 
                 State = TerminalStates.Online;
                 OnAnswering();
+            }
+            else
+            {
+                Console.WriteLine("Terminal {0}: You need to call before you can answer the call.\n", this.Number);
             }
         }
 

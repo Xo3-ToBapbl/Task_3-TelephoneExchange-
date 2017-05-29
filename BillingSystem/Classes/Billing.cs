@@ -1,10 +1,7 @@
-﻿using BillingSystem.Enums;
-using BillingSystem.Interfaces;
+﻿using BillingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BillingSystem.Classes
 {
@@ -45,7 +42,9 @@ namespace BillingSystem.Classes
         {
             if(_repository.ContainsKey(number))
             {
-                var orderedStats = _repository[number].Statistics.OrderBy(x => x.StartTime);
+                var orderedStats = _repository[number].Statistics.
+                    Where(y=>y.StartTime >= DateTime.Now.AddMonths(-1)).
+                    OrderBy(x => x.StartTime);
 
                 if (orderedStats.Count() != 0)
                 {
@@ -54,6 +53,7 @@ namespace BillingSystem.Classes
                         number);
 
                     PrintStatistic(orderedStats);
+                    GetFullInfo(number);
                 }
                 else
                 {
@@ -68,72 +68,16 @@ namespace BillingSystem.Classes
             }
         }
 
-        public void GetFilteredStatistics(StatisticFilters filter, int number, 
-            int targetNumber=0, DateTime date=new DateTime(), ushort minCost=0, ushort maxCost=0)
+        public void GetStatisticByDate(int number, DateTime date)
         {
             if (_repository.ContainsKey(number))
             {
-                switch (filter)
-                {
-                    case StatisticFilters.Date:
-                        {
-                            GetStatisticByDate(number, date);
-                            break;
-                        }
-                    case StatisticFilters.Cost:
-                        {
-                            GetStatisticByCost(number, minCost, maxCost);
-                            break;
-                        }
-                    case StatisticFilters.Abonent:
-                        {
-                            GetStatisticByTargetAbonent(number, targetNumber);
-                            break;
-                        }
-                }
-            }
-            else
-            {
-                Console.WriteLine("\n\nThere is no abonent with number {0}.", number);
-            }
-            
-        }
-
-
-        private void GetStatisticByDate(int number, DateTime date)
-        {
-            var filteredStats = _repository[number].Statistics.Where(x => x.StartTime.Date == date.Date);
-
-            if (filteredStats.Count() != 0)
-            {
-                Console.WriteLine("\n\nFiltered by date {3} statistic for abonent {0} {1}, terminal {2}:",
-                        _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
-                        number, date.Date);
-
-                PrintStatistic(filteredStats);
-            }
-            else
-            {
-                Console.WriteLine("\n\nThere are no statistics for abonent {0} {1}, terminal {2}.",
-                        _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
-                        number);
-            }
-        }
-
-        private void GetStatisticByCost(int number, ushort minCost, ushort maxCost)
-        {
-            if (minCost < maxCost)
-            {
-                var filteredStats = _repository[number].Statistics.
-                    Select(x => x as IOutgoingCallStatistic).
-                    Where(y => (y != null) && (y.Cost >= minCost && y.Cost <= maxCost) ).
-                    OrderBy(z=>z.Cost);
-
+                var filteredStats = _repository[number].Statistics.Where(x => x.StartTime.Date == date.Date);
                 if (filteredStats.Count() != 0)
                 {
-                    Console.WriteLine("\n\nFiltered by cost (from {3} to {4}) statistic for abonent {0} {1}, terminal {2}:",
+                    Console.WriteLine("\n\nFiltered by date {3} statistic for abonent {0} {1}, terminal {2}:",
                             _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
-                            number, minCost, maxCost);
+                            number, date.Date);
 
                     PrintStatistic(filteredStats);
                 }
@@ -146,34 +90,86 @@ namespace BillingSystem.Classes
             }
             else
             {
-                Console.WriteLine("\n\nIncorrect input for terminal {0}. Minimum cost must be less than maximum cost!",
-                            number);
+                Console.WriteLine("\n\nThere is no abonent with number {0}.", number);
             }
-            
         }
 
-        private void GetStatisticByTargetAbonent(int number, int targetNumber)
+        public void GetStatisticByCost(int number, ushort minCost, ushort maxCost)
         {
-            var filteredStats = _repository[number].Statistics.
-                Select(x => x as INotCalledStatistic).
-                Where(y =>y != null && y.TargetNumber == targetNumber);
-
-            if (filteredStats.Count() != 0)
+            if (_repository.ContainsKey(number))
             {
-                Console.WriteLine("\n\nFiltered abonent {3} statistic for abonent {0} {1}, terminal {2}:",
-                        _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
-                        number, targetNumber);
+                if (minCost < maxCost)
+                {
+                    var filteredStats = _repository[number].Statistics.
+                        Select(x => x as IOutgoingCallStatistic).
+                        Where(y => (y != null) && (y.Cost >= minCost && y.Cost <= maxCost)).
+                        OrderBy(z => z.Cost);
 
-                PrintStatistic(filteredStats);
+                    if (filteredStats.Count() != 0)
+                    {
+                        Console.WriteLine("\n\nFiltered by cost (from {3} to {4}) statistic for abonent {0} {1}, terminal {2}:",
+                                _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
+                                number, minCost, maxCost);
+
+                        PrintStatistic(filteredStats);
+                    }
+                    else
+                    {
+                        Console.WriteLine("\n\nThere are no statistics for abonent {0} {1}, terminal {2}.",
+                                _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
+                                number);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("\n\nIncorrect input for terminal {0}. Minimum cost must be less than maximum cost!",
+                                number);
+                }
             }
             else
             {
-                Console.WriteLine("\n\nThere are no statistics for abonent {0} {1}, terminal {2}.",
-                        _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
-                        number);
+                Console.WriteLine("\n\nThere is no abonent with number {0}.", number);
             }
         }
 
+        public void GetStatisticByTargetAbonent(int number, int targetNumber)
+        {
+            if (_repository.ContainsKey(number))
+            {
+                var filteredStats = _repository[number].Statistics.
+                    Select(x => x as INotCalledStatistic).
+                    Where(y => y != null && y.TargetNumber == targetNumber);
+
+                if (filteredStats.Count() != 0)
+                {
+                    Console.WriteLine("\n\nFiltered by abonent {3} statistic for abonent {0} {1}, terminal {2}:",
+                            _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
+                            number, targetNumber);
+
+                    PrintStatistic(filteredStats);
+                }
+                else
+                {
+                    Console.WriteLine("\n\nThere are no statistics for abonent {0} {1}, terminal {2}.",
+                            _repository[number].Contract.SubscriberFirstName, _repository[number].Contract.SubscriberLastName,
+                            number);
+                }
+            }
+            else
+            {
+                Console.WriteLine("\n\nThere is no abonent with number {0}.", number);
+            }
+        }
+
+        private void GetFullInfo(int number)
+        {
+            var sum = _repository[number].Statistics.
+                Where(y => y.StartTime >= DateTime.Now.AddMonths(-1) && y is IOutgoingCallStatistic).
+                Cast<IOutgoingCallStatistic>().
+                Sum(z=>z.Cost);
+            Console.WriteLine("Tariff type: {0}, cost of calls for the last 30 days: {1}.",
+                _repository[number].Tariff.TariffType, sum);
+        }
 
         private void PrintStatistic(IEnumerable<IStatistic> statistics)
         {

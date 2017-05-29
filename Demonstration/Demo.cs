@@ -39,25 +39,9 @@ namespace Demonstration
             terminal_2.Connect();
             terminal_3.Connect();
 
-            terminal_2.Call(333333);
-            terminal_3.Answer();
-            terminal_3.Reject();
-
-            operator_.ChangeTariff(222222, TariffOption.FreeAtNight);
-
-            terminal_2.Call(111111);
-            terminal_1.Answer();
-            terminal_2.Reject();
-
-            terminal_3.Call(111111);
+            terminal_1.Call(222222);
+            terminal_2.Answer();
             terminal_1.Reject();
-
-            terminal_2.Call(111111);
-            terminal_1.Reject();
-
-            terminal_2.Call(333333);
-            terminal_3.Answer();
-            terminal_3.Reject();
 
             terminal_1.Call(333333);
             terminal_3.Answer();
@@ -67,16 +51,34 @@ namespace Demonstration
             terminal_2.Answer();
             terminal_1.Reject();
 
-            terminal_3.Call(222222);
-            terminal_2.Answer();
+            terminal_2.Call(333333);
+            terminal_3.Answer();
+            terminal_1.Call(333333);
             terminal_2.Reject();
 
             terminal_3.Call(111111);
-            terminal_1.Reject();
+            terminal_1.Answer();
+            terminal_3.Reject();
+
+            operator_.ChangeTariff(222222, TariffOption.FreeAtNight);
+
+            terminal_2.Call(111111);
+            terminal_1.Answer();
+            terminal_3.Call(222222);
+            terminal_2.Reject();
+
+            terminal_2.Call(333333);
+            terminal_3.Answer();
+            terminal_2.Reject();
+
+            terminal_2.Disconect();
 
             billing.GetFullStatistic(111111);
             billing.GetFullStatistic(222222);
             billing.GetFullStatistic(333333);
+
+            billing.GetStatisticByCost(111111, 10, 60);
+            billing.GetStatisticByTargetAbonent(111111, 222222);
             #endregion
             #region Close application
             Console.WriteLine("\nPress any key to close.");

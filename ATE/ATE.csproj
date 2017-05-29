@@ -43,7 +43,6 @@
     <Compile Include="Enums\CallStats.cs" />
     <Compile Include="Enums\TerminalStates.cs" />
     <Compile Include="EventArgsClasses\CallEventArgs.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="HandlerClasses\Port.cs" />
     <Compile Include="HandlerClasses\Station.cs" />
     <Compile Include="Enums\PortStates.cs" />

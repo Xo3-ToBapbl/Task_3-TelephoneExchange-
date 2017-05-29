@@ -56,8 +56,8 @@ namespace ATE.HandlerClasses
 
         protected virtual void OnPortStateChanged(object sender, PortStates state)
         { 
-            //Console.WriteLine("Port[{0}]: changing state to '{1}', terminal {2} now {3}.\n", 
-                //this.PortId, state, _terminal.Number, _terminal.State);
+            Console.WriteLine("Port[{0}]: changing state to '{1}', terminal {2} now {3}.\n", 
+                this.PortId, state, _terminal.Number, _terminal.State);
 
             PortStateChanging?.Invoke(sender, state);
         }

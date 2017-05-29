@@ -6,6 +6,7 @@ using BillingSystem.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace ATE.HandlerClasses
 {
@@ -85,8 +86,8 @@ namespace ATE.HandlerClasses
         
         public void DetectChanges(object sender, PortStates state)
         {
-            //Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
-                //(sender as IPort).PortId, state);
+            Console.WriteLine("Station: port[{0}] change state to '{1}'.\n", 
+                (sender as IPort).PortId, state);
         }
 
 
@@ -131,6 +132,7 @@ namespace ATE.HandlerClasses
                 "Station: port[{0}] transfer answer from terminal {2} to terminal {1}. Terminals online.\n",
                 (sender as IPort).PortId, e.SourceNumber, e.TargetNumber);
 
+            Thread.Sleep(750);
             _callSpan = TimeSpan.FromMinutes(random.Next(1, 15));
             _day = DateTime.Now.AddDays(random.Next(0, 5));
 
